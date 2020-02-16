@@ -1,0 +1,39 @@
+<%- include('../includes/head.ejs') %>
+<title><%= pageTitle %></title>
+</head>
+
+<body>
+    <%- include('../includes/nav.ejs') %>
+    <main>
+    <h2>Products</h2>
+        <% if (products.length > 0) { %>
+            <div class="products">
+                <% products.forEach(function(item) {  %>
+                    <div>
+                        <h3>
+                            <%= item.title %>
+                        </h3>
+
+                        <div>
+                            Quantity: <%= item.quantity %>
+                        </div>
+
+                        <div class="actions">
+                            <form action="/cart-delete-item" method="post">
+                                <button class="btn" type="submit">Delete</button>
+                                <input type="hidden" name="productId" value="<%= item._id %>" />
+                            </form>
+                        </div>
+                    </div>
+                <%  }); %>
+            </div>    
+
+            <div class="actions">
+                <form action="/create-order" method="post">
+                    <button class="btn" type="submit">Create Order</button>
+                </form>
+            </div>
+        <% } %>    
+    </main>
+</body>
+</html>
