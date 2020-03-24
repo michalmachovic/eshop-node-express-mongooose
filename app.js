@@ -6,7 +6,7 @@ const app = express();
 const shopRoutes = require('./routes/shop');
 const adminRoutes = require('./routes/admin');
 
-const mongoConnect = require('./util/db').mongoConnect;
+const mongoose = require('mongoose');
 const User = require('./models/user');
 
 //set template engine to EJS
@@ -17,9 +17,9 @@ app.set('views', 'views');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
-    User.findById('5e3ed9cee844e413f1269e18')
+    User.findById('5e49b4c469ac8e20ab195a16')
     .then(user => {
-        req.user = new User(user.name, user.email, user.cart, user._id);
+        req.user = user;
         next();
     })
     .catch(err => console.log(err));
@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.urlencoded({exteneded: false}));
 app.use(shopRoutes);
 app.use('/admin', adminRoutes);
-
+/*
 app.get('/test', (req, res, next) => {
     res.send('<h1>testing</h1>');
 });
@@ -36,8 +36,31 @@ app.get('/test', (req, res, next) => {
 app.get('/', (req, res, next) => {
     res.send('<h1>hello</h1>');
 });
+*/
 
-
-mongoConnect(()  => {
-        app.listen(3000);
-});
+mongoose
+    .connect(
+        'mongodb+srv://macho:7EfwuOmBNUmbjG2T@cluster0-gconm.mongodb.net/test?retryWrites=true&w=majority'
+    )
+    .then(
+        result => {
+            User.findOne().then(user => {
+                if (!user) {
+                    const user = new User({
+                        name: "Michal",
+                        email: "michal.machovic@gmail.com",
+                        cart: {
+                            items: []
+                        }
+                    });
+                    user.save();
+                }
+            });
+            app.listen(3000);
+        }
+    )
+    .catch(
+        error => {
+            console.log(error);
+        }
+    )
